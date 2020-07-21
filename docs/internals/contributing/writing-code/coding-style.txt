@@ -52,6 +52,12 @@ Python style
   single quote. Don't waste time doing unrelated refactoring of existing code
   to conform to this style.
 
+* String variable interpolation may use %-formatting, ``format()``, or
+  f-strings as appropriate, with the goal of maximizing code readability.
+  f-strings should not be used for any string that may require translation,
+  including error and logging messages. Don't waste time doing unrelated
+  refactoring of existing code to adjust the formatting method.
+
 * Avoid use of "we" in comments, e.g. "Loop over" rather than "We loop over".
 
 * Use underscores, not camelCase, for variable, function and method names
