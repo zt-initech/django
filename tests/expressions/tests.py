@@ -1567,3 +1567,23 @@ class CombinableTests(SimpleTestCase):
     def test_reversed_or(self):
         with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
             object() | Combinable()
+
+
+class Ticket31830Tests(TestCase):
+    def test_ticket_31830(self):
+        employee1 = Employee.objects.create(firstname='a', lastname='b')
+        company1 = Company.objects.create(name='1', num_employees=1, num_chairs=1, ceo=employee1)
+        qs1 = Company.objects \
+            .filter(ceo_id=OuterRef('pk'), id__in=[company1.id]) \
+            .values('id')
+        qs2 = Company.objects \
+            .filter(ceo_id=OuterRef('pk'), id__in=[]) \
+            .values('id')
+        qs = Employee.objects \
+            .annotate(qs1=Exists(qs1), qs2=Exists(qs2)) \
+            .filter(Q(qs1=True) | Q(qs2=True))
+        count_before = qs.count()
+        count_items = len(qs)
+        count_after = qs.count()
+        self.assertEqual(count_before, count_items)
+        self.assertEqual(count_before, count_after)
